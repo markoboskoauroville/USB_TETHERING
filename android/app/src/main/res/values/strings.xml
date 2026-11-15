@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">USB Tethering (Mantra)</string>
+    <string name="tile_label">USB tethering</string>
+</resources>
