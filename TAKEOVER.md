@@ -12,4 +12,6 @@ Public, unpromoted repository: no README, no description (MANTRA_MANIFEST module
 
 **Build.** Only GitHub Actions (.github/workflows/android.yml), release vN Latest, appVersion in android/gradle.properties, whole numbers. Updater: AppUpdater.kt (kit android-updater) asks at start. Keystore secret ANDROID_DEBUG_KEYSTORE_B64 set.
 
+**v2 (15.11.2026):** status-bar icons readable on the light screen.
+
 **Not proven.** The Shizuku toggle on the Nothing (no hand on it yet); on the emulator only the fallback, the widget and the tile were tried.
