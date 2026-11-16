@@ -1,4 +1,4 @@
-# USB Tethering (Mantra) - takeover
+**v5 (16.11.2026): fallback refresh every ~15 min (inexact AlarmManager, FallbackReceiver) and on screen-on, in case UsbWatch is killed.** # USB Tethering (Mantra) - takeover
 
 Public, unpromoted repository: no README, no description (MANTRA_MANIFEST modules/repo-privacy.md).
 

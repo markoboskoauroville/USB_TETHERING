@@ -1,6 +1,8 @@
 package community.auroville.usbtether
 
+import android.app.AlarmManager
 import android.app.Notification
+import android.app.PendingIntent
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
@@ -32,6 +34,8 @@ class UsbWatch : Service() {
         runCatching { startForeground(7, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE) }
         registerReceiver(rx, IntentFilter("android.hardware.usb.action.USB_STATE"))
         registerReceiver(rx, IntentFilter("android.net.conn.TETHER_STATE_CHANGED"))
+        registerReceiver(rx, IntentFilter(Intent.ACTION_SCREEN_ON))   // v5: redraw when the screen comes on
+        schedule(this)
         refreshAll(this)
     }
 
@@ -40,6 +44,14 @@ class UsbWatch : Service() {
     override fun onDestroy() { runCatching { unregisterReceiver(rx) }; super.onDestroy() }
 
     companion object {
+        /** v5: fallback in case UsbWatch is killed: an inexact repeat about every 15 minutes (no permission needed). */
+        fun schedule(c: Context) {
+            runCatching {
+                val pi = PendingIntent.getBroadcast(c, 5, Intent(c, FallbackReceiver::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                c.getSystemService(AlarmManager::class.java).setInexactRepeating(AlarmManager.RTC, System.currentTimeMillis() + AlarmManager.INTERVAL_FIFTEEN_MINUTES, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pi)
+            }
+        }
+
         fun start(c: Context) { runCatching { c.startForegroundService(Intent(c, UsbWatch::class.java)) } }
 
         /** Redraw the widget and ask the tile to redraw. */
