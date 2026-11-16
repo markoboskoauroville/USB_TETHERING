@@ -3,6 +3,7 @@ package community.auroville.usbtether
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.provider.Settings
 import rikka.shizuku.Shizuku
@@ -38,22 +39,33 @@ object Tether {
         out
     }.getOrNull()
 
+    /** Pure decision, unit tested: USB_STATE extras say tethering when rndis or ncm is on. */
+    fun usbExtrasSayOn(rndis: Boolean, ncm: Boolean) = rndis || ncm
+
+    /** Pure decision, unit tested: tethering interface names on Android (rndis0, usb0, ncm0). */
+    fun isTetherIface(name: String) = name.startsWith("rndis") || name.startsWith("usb") || name.startsWith("ncm")
+
+    /** The sticky USB_STATE broadcast: readable by any app, no permission, carries rndis/ncm on every Android. */
+    private fun stickyOn(c: Context): Boolean? = runCatching {
+        val i = c.registerReceiver(null, IntentFilter("android.hardware.usb.action.USB_STATE")) ?: return null
+        usbExtrasSayOn(i.getBooleanExtra("rndis", false), i.getBooleanExtra("ncm", false))
+    }.getOrNull()
+
+    // Apps cannot list interfaces on Android 11+ (netlink is denied), so this is only the last fallback.
     private fun ifaceUp(): Boolean = runCatching {
-        NetworkInterface.getNetworkInterfaces().toList().any {
-            (it.name.startsWith("rndis") || it.name.startsWith("usb")) && it.isUp
-        }
+        NetworkInterface.getNetworkInterfaces().toList().any { isTetherIface(it.name) && it.isUp }
     }.getOrDefault(false)
 
     /** The last state we knew: what the widget and the tile draw without waiting for a shell. */
     fun known(c: Context): Boolean =
-        ifaceUp() || c.getSharedPreferences(PREFS, 0).getBoolean("on", false)
+        stickyOn(c) ?: (ifaceUp() || c.getSharedPreferences(PREFS, 0).getBoolean("on", false))
 
     private fun remember(c: Context, on: Boolean) = c.getSharedPreferences(PREFS, 0).edit().putBoolean("on", on).apply()
 
     /** The true state: the USB function list says rndis. Needs Shizuku; otherwise the interface check. */
     fun isOn(c: Context): Boolean {
-        val on = if (shizuku(c) == Shiz.READY) {
-            sh("getprop sys.usb.state; getprop sys.usb.config")?.contains("rndis") ?: ifaceUp()
+        val on = stickyOn(c) ?: if (shizuku(c) == Shiz.READY) {
+            sh("getprop sys.usb.state; getprop sys.usb.config")?.let { it.contains("rndis") || it.contains("ncm") } ?: ifaceUp()
         } else ifaceUp()
         remember(c, on)
         return on
@@ -66,7 +78,7 @@ object Tether {
         sh(if (wasOn) "svc usb setFunctions" else "svc usb setFunctions rndis") ?: return null
         Thread.sleep(1200)
         val now = isOn(c)
-        TetherWidget.updateAll(c)
+        UsbWatch.refreshAll(c)
         return now
     }
 

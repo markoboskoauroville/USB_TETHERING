@@ -16,4 +16,6 @@ Public, unpromoted repository: no README, no description (MANTRA_MANIFEST module
 
 **v3 (16.11.2026):** widget is a black circle with the white (ON) or grey #808080 (OFF) USB symbol, no text; the tile keeps the same USB symbol. Request in momentaryupdates.md.
 
+**v4 (16.11.2026):** bug fix, widget stayed grey while tethering was ON. Cause: state came from NetworkInterface, which apps cannot read on Android 11+, and nothing redrew the widget on outside changes. Now the sticky USB_STATE broadcast (rndis/ncm) is the reader, and UsbWatch (foreground service, quiet notification, started by widget, tile, app, boot) redraws widget and tile on every USB_STATE / tether change. Unit test TetherStateTest runs in the workflow.
+
 **Not proven.** The Shizuku toggle on the Nothing (no hand on it yet); on the emulator only the fallback, the widget and the tile were tried.

@@ -10,7 +10,8 @@ import android.graphics.Color
 import android.widget.RemoteViews
 
 class TetherWidget : AppWidgetProvider() {
-    override fun onUpdate(c: Context, m: AppWidgetManager, ids: IntArray) = updateAll(c)
+    override fun onUpdate(c: Context, m: AppWidgetManager, ids: IntArray) { updateAll(c); UsbWatch.start(c) }
+    override fun onEnabled(c: Context) { UsbWatch.start(c) }
 
     companion object {
         fun updateAll(c: Context) {

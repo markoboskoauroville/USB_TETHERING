@@ -8,6 +8,7 @@ import android.service.quicksettings.TileService
 
 class TetherTile : TileService() {
     override fun onStartListening() {
+        UsbWatch.start(applicationContext)
         draw(Tether.known(this))
         Thread { val on = Tether.isOn(applicationContext); mainExecutor.execute { draw(on) } }.start()
     }

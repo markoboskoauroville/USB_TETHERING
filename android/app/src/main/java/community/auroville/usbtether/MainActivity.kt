@@ -24,6 +24,7 @@ class MainActivity : Activity() {
 
     override fun onCreate(b: Bundle?) {
         super.onCreate(b)
+        UsbWatch.start(applicationContext)
         val d = resources.displayMetrics.density
         fun dp(n: Int) = (n * d).toInt()
 

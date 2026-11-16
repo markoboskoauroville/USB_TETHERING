@@ -9,6 +9,7 @@ import kotlin.concurrent.thread
 class TapActivity : Activity() {
     override fun onCreate(b: Bundle?) {
         super.onCreate(b)
+        UsbWatch.start(applicationContext)
         val app = applicationContext
         thread {
             val r = Tether.toggle(app)
@@ -18,7 +19,7 @@ class TapActivity : Activity() {
                     true -> Toast.makeText(this, "USB tethering ON", Toast.LENGTH_SHORT).show()
                     false -> Toast.makeText(this, "USB tethering OFF", Toast.LENGTH_SHORT).show()
                 }
-                TetherWidget.updateAll(app)
+                UsbWatch.refreshAll(app)
                 finish()
             }
         }
