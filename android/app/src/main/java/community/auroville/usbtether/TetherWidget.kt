@@ -19,8 +19,7 @@ class TetherWidget : AppWidgetProvider() {
             if (ids.isEmpty()) return
             val on = Tether.known(c)
             val v = RemoteViews(c.packageName, R.layout.widget)
-            v.setTextViewText(R.id.state, if (on) "ON" else "OFF")
-            v.setInt(R.id.root, "setBackgroundColor", if (on) Color.parseColor("#FF1B8A3E") else Color.parseColor("#FF222222"))
+            v.setInt(R.id.usb, "setColorFilter", if (on) Color.WHITE else Color.parseColor("#FF808080"))
             val tap = PendingIntent.getActivity(
                 c, 0, Intent(c, TapActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT

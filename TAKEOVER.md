@@ -14,4 +14,6 @@ Public, unpromoted repository: no README, no description (MANTRA_MANIFEST module
 
 **v2 (15.11.2026):** status-bar icons readable on the light screen.
 
+**v3 (16.11.2026):** widget is a black circle with the white (ON) or grey #808080 (OFF) USB symbol, no text; the tile keeps the same USB symbol. Request in momentaryupdates.md.
+
 **Not proven.** The Shizuku toggle on the Nothing (no hand on it yet); on the emulator only the fallback, the widget and the tile were tried.
